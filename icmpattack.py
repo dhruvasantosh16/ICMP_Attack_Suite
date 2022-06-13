@@ -1,4 +1,14 @@
+from impacket import ImpactDecoder
+from impacket import ImpactPacket
+
 def welcome():
+    #Dependency Check
+    try: 
+        from impacket import ImpactDecoder
+    except ImportError:
+        print("Impacket library is missing (Run", "pip install impacket)")
+        exit(1)
+    #Welcome Prompt
     print("Welcome to ICMP Attack Suite!", "1. Set ICMP Parameters", "2. Set ICMP Payload", "3. Start Attack", "4. Exit", sep='\n', end='\n')
     sel1 = input("Your Selection: ")
     if(sel1 == "1"):
