@@ -12,7 +12,7 @@ def welcome():
         print("Impacket library is missing (Run", "pip install impacket)")
         exit(1)
     #Welcome Prompt
-    print("Welcome to ICMP Attack Suite!", "1. Set ICMP Parameters", "2. Set ICMP Payload", "3. Start Attack", "4. Exit", sep='\n', end='\n')
+    print('\n', "Welcome to ICMP Attack Suite!", '\n', "1. Set ICMP Parameters", "2. Set ICMP Payload", "3. Start Attack", "4. Exit", '\n', sep='\n', end='\n')
     sel1 = input("Your Selection: ")
     if(sel1 == "1"):
         icmpparams()
@@ -30,17 +30,18 @@ def icmpparams():
     setICMP()
 
 def payloads():
-    
+    print("Payload Block")
 
 def exploit():
     print("Add Exploit Block here")
 
 def setIP():
-    dst = input("Enter Victim IP address")
+    dst = input("Enter Victim IP address: ")
     host = socket.gethostname()
     src = socket.gethostbyname(host)
     ipheader.set_ip_dst(dst)
     ipheader.set_ip_src(src)
+    print('\n', "IP Header: ", ipheader, '\n')
     return(ipheader)
 
 def setICMP():
