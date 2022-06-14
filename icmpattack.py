@@ -1,5 +1,8 @@
 from impacket import ImpactDecoder
 from impacket import ImpactPacket
+import socket
+ipheader = ImpactPacket.IP()
+icmpheader = ImpactPacket.ICMP()
 
 def welcome():
     #Dependency Check
@@ -23,13 +26,26 @@ def welcome():
         print("Invalid Option ")
 
 def icmpparams():
-    print("Add Parameters here")
+    setIP()
+    setICMP()
 
 def payloads():
-    print("Add Payloads here")
+    
 
 def exploit():
     print("Add Exploit Block here")
+
+def setIP():
+    dst = input("Enter Victim IP address")
+    host = socket.gethostname()
+    src = socket.gethostbyname(host)
+    ipheader.set_ip_dst(dst)
+    ipheader.set_ip_src(src)
+    return(ipheader)
+
+def setICMP():
+    icmpheader.set_icmp_type(icmpheader.ICMP_ECHO)
+    
 
 def main():
     welcome()
